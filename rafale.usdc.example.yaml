@@ -1,0 +1,38 @@
+# Rafale Example Configuration - USDC Transfer Events on Linea Mainnet
+# Copy this file to rafale.yaml and update the database connection string.
+#
+# Quick Start:
+#   cp rafale.usdc.example.yaml rafale.yaml
+#   # Edit database connection below
+#   ./rafale start
+
+name: rafale-usdc-example
+network: linea-mainnet
+rpc_url: https://rpc.linea.build
+
+# PostgreSQL connection string
+# Update host/port/user/password as needed for your environment
+#
+# sslmode options:
+#   disable     - No SSL (local dev only)
+#   require     - SSL, no cert verification
+#   verify-ca   - SSL, verify CA signature
+#   verify-full - SSL, verify CA + hostname (production)
+database: "host=localhost port=port user=user password=password dbname=rafale sslmode=disable"
+
+server:
+  graphql_port: 8080   # GraphQL Playground at http://localhost:8080
+  metrics_port: 9090   # Prometheus metrics at http://localhost:9090/metrics
+
+sync:
+  batch_size: 10       # Blocks per batch (increase for faster sync)
+
+# USDC on Linea Mainnet
+# This indexes Transfer events from the official USDC contract
+contracts:
+  usdc:
+    address: "0x176211869cA2b568f2A7D4EE941E073a821EE1ff"
+    abi: "./abis/erc20.json"
+    start_block: 1000000  # Start from block 1M (adjust as needed)
+    events:
+      - Transfer          # ERC20 Transfer(from, to, value)
