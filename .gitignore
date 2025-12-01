@@ -43,8 +43,5 @@ build/
 # Empty placeholder directories
 generated/
 
-rafale_blueprint.md
-rafale_ROADMAP.md
-rafale_TECHNICAL_VERIFICATION.md
-rafale.yaml
+
 .playwright-mcp

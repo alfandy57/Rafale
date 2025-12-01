@@ -107,8 +107,11 @@ func New(cfg *config.Config) (*Engine, error) {
 	}
 	log.Info().Msg("database migrations complete")
 
-	// Create hypertables for time-series optimization (if TimescaleDB available)
-	db.CreateHypertable("transfers", "timestamp", "1 day")
+	// Setup TimescaleDB optimizations (hypertable + compression + retention)
+	tsCfg := store.DefaultTimescaleConfig()
+	if err := db.SetupTimescaleDB(context.Background(), "transfers", "timestamp", tsCfg); err != nil {
+		log.Warn().Err(err).Msg("TimescaleDB setup warning (non-fatal)")
+	}
 
 	// Initialize decoder
 	dec := decoder.New()
