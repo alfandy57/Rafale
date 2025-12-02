@@ -4,7 +4,7 @@ package version
 // Build-time variables set via ldflags.
 var (
 	// Version is the semantic version (e.g., "1.0.0").
-	Version = "dev"
+	Version = "1.0.0"
 
 	// Commit is the git commit hash.
 	Commit = "unknown"
