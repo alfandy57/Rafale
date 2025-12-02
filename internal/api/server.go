@@ -20,9 +20,10 @@ import (
 
 	"github.com/0xredeth/Rafale/internal/api/graphql/generated"
 	"github.com/0xredeth/Rafale/internal/api/graphql/resolver"
-	"github.com/0xredeth/Rafale/pkg/config"
+	"github.com/0xredeth/Rafale/internal/pubsub"
 	"github.com/0xredeth/Rafale/internal/rpc"
 	"github.com/0xredeth/Rafale/internal/store"
+	"github.com/0xredeth/Rafale/pkg/config"
 )
 
 // Server is the GraphQL API server.
@@ -38,13 +39,14 @@ type Server struct {
 //   - cfg (*config.Config): application configuration
 //   - store (*store.Store): database store
 //   - rpc (*rpc.Client): RPC client
+//   - broadcaster (*pubsub.Broadcaster): pub/sub broadcaster for subscriptions
 //
 // Returns:
 //   - *Server: initialized server
-func NewServer(cfg *config.Config, store *store.Store, rpc *rpc.Client) *Server {
+func NewServer(cfg *config.Config, store *store.Store, rpc *rpc.Client, broadcaster *pubsub.Broadcaster) *Server {
 	return &Server{
 		cfg:      cfg,
-		resolver: resolver.NewResolver(cfg, store, rpc),
+		resolver: resolver.NewResolver(cfg, store, rpc, broadcaster),
 	}
 }
 

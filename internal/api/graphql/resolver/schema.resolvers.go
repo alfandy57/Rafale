@@ -230,35 +230,46 @@ func (r *queryResolver) EventsByTx(ctx context.Context, txHash string) ([]*model
 }
 
 // NewEvent is the resolver for the newEvent field.
+// Subscribers receive real-time events matching optional contract and event name filters.
+//
+// Parameters:
+//   - ctx (context.Context): context for subscription lifecycle
+//   - contract (*string): optional contract name filter
+//   - eventName (*string): optional event name filter
+//
+// Returns:
+//   - <-chan *model.GenericEvent: channel streaming matching events
+//   - error: nil on success
 func (r *subscriptionResolver) NewEvent(ctx context.Context, contract *string, eventName *string) (<-chan *model.GenericEvent, error) {
-	// TODO: Implement event subscription with pubsub
-	ch := make(chan *model.GenericEvent)
-	go func() {
-		<-ctx.Done()
-		close(ch)
-	}()
+	ch, _ := r.Broadcaster.SubscribeEvents(ctx, contract, eventName)
 	return ch, nil
 }
 
 // NewBlock is the resolver for the newBlock field.
+// Subscribers receive real-time block notifications as they are indexed.
+//
+// Parameters:
+//   - ctx (context.Context): context for subscription lifecycle
+//
+// Returns:
+//   - <-chan *model.Block: channel streaming new blocks
+//   - error: nil on success
 func (r *subscriptionResolver) NewBlock(ctx context.Context) (<-chan *model.Block, error) {
-	// TODO: Implement block subscription
-	ch := make(chan *model.Block)
-	go func() {
-		<-ctx.Done()
-		close(ch)
-	}()
+	ch, _ := r.Broadcaster.SubscribeBlocks(ctx)
 	return ch, nil
 }
 
 // SyncStatusUpdated is the resolver for the syncStatusUpdated field.
+// Subscribers receive real-time sync status updates as indexing progresses.
+//
+// Parameters:
+//   - ctx (context.Context): context for subscription lifecycle
+//
+// Returns:
+//   - <-chan *model.SyncStatus: channel streaming status updates
+//   - error: nil on success
 func (r *subscriptionResolver) SyncStatusUpdated(ctx context.Context) (<-chan *model.SyncStatus, error) {
-	// TODO: Implement sync status subscription
-	ch := make(chan *model.SyncStatus)
-	go func() {
-		<-ctx.Done()
-		close(ch)
-	}()
+	ch, _ := r.Broadcaster.SubscribeSyncStatus(ctx)
 	return ch, nil
 }
 
