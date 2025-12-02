@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/0xredeth/Rafale/pkg/config"
 	"github.com/0xredeth/Rafale/internal/rpc"
 	"github.com/0xredeth/Rafale/internal/store"
+	"github.com/0xredeth/Rafale/pkg/config"
 )
 
 // statusCmd shows sync status.
@@ -32,7 +32,7 @@ func init() {
 //
 // Returns:
 //   - error: nil on success, status retrieval error on failure
-func runStatus(cmd *cobra.Command, args []string) error {
+func runStatus(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
@@ -49,7 +49,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("connecting to database: %w", err)
 	}
-	defer db.Close()
+	defer db.Close() //nolint:errcheck // Error on close is not actionable in defer
 
 	// Get indexed block
 	indexedBlock, err := db.GetMaxBlockNumber(ctx, "transfers")
@@ -85,14 +85,15 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	// Determine status
-	status := "Idle"
-	if indexedBlock == 0 {
+	var status string
+	switch {
+	case indexedBlock == 0:
 		status = "Not started"
-	} else if lag > 100 {
+	case lag > 100:
 		status = "Syncing"
-	} else if lag > 0 {
+	case lag > 0:
 		status = "Catching up"
-	} else {
+	default:
 		status = "Synced"
 	}
 

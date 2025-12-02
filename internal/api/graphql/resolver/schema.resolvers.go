@@ -60,7 +60,7 @@ func (r *queryResolver) Block(ctx context.Context, number string) (*model.Block,
 	return &model.Block{
 		Number:     strconv.FormatUint(header.Number.Uint64(), 10),
 		Hash:       header.Hash().Hex(),
-		Timestamp:  time.Unix(int64(header.Time), 0),
+		Timestamp:  time.Unix(int64(header.Time), 0), //nolint:gosec // G115: Timestamp won't overflow
 		ParentHash: header.ParentHash.Hex(),
 	}, nil
 }
@@ -314,8 +314,8 @@ func eventToGenericEvent(e *store.Event) *model.GenericEvent {
 		ID:          strconv.FormatUint(e.ID, 10),
 		BlockNumber: strconv.FormatUint(e.BlockNumber, 10),
 		TxHash:      e.TxHash,
-		TxIndex:     int(e.TxIndex),
-		LogIndex:    int(e.LogIndex),
+		TxIndex:     int(e.TxIndex),  //nolint:gosec // G115: TxIndex is small
+		LogIndex:    int(e.LogIndex), //nolint:gosec // G115: LogIndex is small
 		Timestamp:   e.Timestamp,
 		Contract:    e.ContractName,
 		EventName:   e.EventName,

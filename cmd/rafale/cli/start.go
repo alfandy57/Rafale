@@ -51,7 +51,7 @@ func init() {
 //
 // Returns:
 //   - error: nil on success, startup error on failure
-func runStart(cmd *cobra.Command, args []string) error {
+func runStart(_ *cobra.Command, _ []string) error {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
@@ -93,7 +93,7 @@ func runStart(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("creating store: %w", err)
 	}
-	defer db.Close()
+	defer db.Close() //nolint:errcheck // Error on close is not actionable in defer
 
 	// Initialize broadcaster for real-time subscriptions
 	broadcaster := pubsub.NewBroadcaster()
@@ -103,7 +103,11 @@ func runStart(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("creating engine: %w", err)
 	}
-	defer eng.Close()
+	defer func() {
+		if err := eng.Close(); err != nil {
+			log.Error().Err(err).Msg("error closing engine")
+		}
+	}()
 
 	// Initialize API server
 	apiServer := api.NewServer(cfg, db, rpcClient, broadcaster)
@@ -117,7 +121,11 @@ func runStart(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("setting up watch mode: %w", err)
 		}
-		defer fileWatcher.Close()
+		defer func() {
+			if err := fileWatcher.Close(); err != nil {
+				log.Error().Err(err).Msg("error closing watcher")
+			}
+		}()
 
 		// Run watcher in background
 		g.Go(func() error {
@@ -127,7 +135,7 @@ func runStart(cmd *cobra.Command, args []string) error {
 		// Stop watcher on context cancellation
 		go func() {
 			<-gctx.Done()
-			fileWatcher.Close()
+			_ = fileWatcher.Close() // Error already logged in defer
 		}()
 	}
 
@@ -205,7 +213,7 @@ func setupWatchMode(eng *engine.Engine) (*watcher.Watcher, error) {
 		log.Info().Msg("hot-reload complete")
 	})
 	if err != nil {
-		fileWatcher.Close()
+		_ = fileWatcher.Close() // Ignore error on cleanup after setup failure
 		return nil, fmt.Errorf("watching config file: %w", err)
 	}
 

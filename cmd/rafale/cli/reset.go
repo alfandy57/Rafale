@@ -11,8 +11,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/0xredeth/Rafale/pkg/config"
 	"github.com/0xredeth/Rafale/internal/store"
+	"github.com/0xredeth/Rafale/pkg/config"
 )
 
 var forceReset bool
@@ -42,7 +42,7 @@ func init() {
 //
 // Returns:
 //   - error: nil on success, reset error on failure
-func runReset(cmd *cobra.Command, args []string) error {
+func runReset(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
@@ -78,7 +78,7 @@ func runReset(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("connecting to database: %w", err)
 	}
-	defer db.Close()
+	defer db.Close() //nolint:errcheck // Error on close is not actionable in defer
 
 	// Execute reset
 	if err := db.Reset(ctx); err != nil {

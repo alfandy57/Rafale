@@ -109,9 +109,9 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.Handle("/", playground.Handler("Rafale GraphQL", "/graphql"))
 
 	// Health check
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	addr := fmt.Sprintf(":%d", s.cfg.Server.GraphQLPort)

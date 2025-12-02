@@ -131,7 +131,7 @@ func (g *Generator) Generate(contractName, abiJSON string, events []string) erro
 	}
 
 	// Ensure output directory exists
-	if err := os.MkdirAll(g.OutputDir, 0755); err != nil {
+	if err := os.MkdirAll(g.OutputDir, 0755); err != nil { //nolint:gosec // G301: 0755 is standard for directories
 		return fmt.Errorf("creating output directory: %w", err)
 	}
 
@@ -203,7 +203,7 @@ func (g *Generator) generateEventFile(outputPath string, event EventInfo) error 
 		return fmt.Errorf("executing event template: %w", err)
 	}
 
-	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil { //nolint:gosec // G306: 0644 is standard for source files
 		return fmt.Errorf("writing file %s: %w", outputPath, err)
 	}
 
@@ -233,7 +233,7 @@ func (g *Generator) Finalize() error {
 	}
 
 	migrateFile := filepath.Join(g.OutputDir, "migrate.go")
-	if err := os.WriteFile(migrateFile, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(migrateFile, buf.Bytes(), 0644); err != nil { //nolint:gosec // G306: 0644 is standard for source files
 		return fmt.Errorf("writing migrate file: %w", err)
 	}
 
@@ -277,7 +277,7 @@ func toSnakeCase(s string) string {
 }
 
 // buildGormTag builds a GORM tag for a field.
-func buildGormTag(name, solidityType string, indexed bool) string {
+func buildGormTag(name, _ string, indexed bool) string {
 	column := toSnakeCase(name)
 	tag := fmt.Sprintf("column:%s", column)
 

@@ -73,14 +73,14 @@ type BlockInfo struct {
 	ParentHash string
 }
 
-// HandlerFunc is the signature for event handlers.
+// Func is the signature for event handlers.
 // The event parameter contains decoded event data.
-type HandlerFunc func(ctx *Context) error
+type Func func(ctx *Context) error
 
 // Registry manages event handlers.
 type Registry struct {
 	mu       sync.RWMutex
-	handlers map[string]HandlerFunc // eventID -> handler
+	handlers map[string]Func // eventID -> handler
 }
 
 // globalRegistry is the default handler registry.
@@ -92,7 +92,7 @@ var globalRegistry = NewRegistry()
 //   - *Registry: initialized registry
 func NewRegistry() *Registry {
 	return &Registry{
-		handlers: make(map[string]HandlerFunc),
+		handlers: make(map[string]Func),
 	}
 }
 
@@ -101,8 +101,8 @@ func NewRegistry() *Registry {
 //
 // Parameters:
 //   - eventID (string): event identifier (e.g., "USDC:Transfer")
-//   - handler (HandlerFunc): the handler function
-func Register(eventID string, handler HandlerFunc) {
+//   - handler (Func): the handler function
+func Register(eventID string, handler Func) {
 	globalRegistry.Register(eventID, handler)
 }
 
@@ -110,8 +110,8 @@ func Register(eventID string, handler HandlerFunc) {
 //
 // Parameters:
 //   - eventID (string): event identifier (e.g., "USDC:Transfer")
-//   - handler (HandlerFunc): the handler function
-func (r *Registry) Register(eventID string, handler HandlerFunc) {
+//   - handler (Func): the handler function
+func (r *Registry) Register(eventID string, handler Func) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -129,9 +129,9 @@ func (r *Registry) Register(eventID string, handler HandlerFunc) {
 //   - eventID (string): event identifier
 //
 // Returns:
-//   - HandlerFunc: the handler function
+//   - Func: the handler function
 //   - bool: true if handler exists
-func Get(eventID string) (HandlerFunc, bool) {
+func Get(eventID string) (Func, bool) {
 	return globalRegistry.Get(eventID)
 }
 
@@ -141,9 +141,9 @@ func Get(eventID string) (HandlerFunc, bool) {
 //   - eventID (string): event identifier
 //
 // Returns:
-//   - HandlerFunc: the handler function
+//   - Func: the handler function
 //   - bool: true if handler exists
-func (r *Registry) Get(eventID string) (HandlerFunc, bool) {
+func (r *Registry) Get(eventID string) (Func, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

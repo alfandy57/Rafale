@@ -42,7 +42,7 @@ func init() {
 //
 // Returns:
 //   - error: nil on success, code generation error on failure
-func runCodegen(cmd *cobra.Command, args []string) error {
+func runCodegen(_ *cobra.Command, _ []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
@@ -78,7 +78,7 @@ func runCodegen(cmd *cobra.Command, args []string) error {
 			abiPath = filepath.Join(cwd, abiPath)
 		}
 
-		abiJSON, err := os.ReadFile(abiPath)
+		abiJSON, err := os.ReadFile(abiPath) //nolint:gosec // G304: Path is validated from config
 		if err != nil {
 			return fmt.Errorf("reading ABI for %s: %w", name, err)
 		}

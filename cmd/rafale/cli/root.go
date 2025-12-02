@@ -28,7 +28,7 @@ into PostgreSQL with TimescaleDB and exposes them via GraphQL API.
 
 A burst of blockchain events. Index fast. Query faster.`,
 	Version: fmt.Sprintf("%s (commit: %s, built: %s)", version.Version, version.Commit, version.Date),
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		setupLogging()
 	},
 }

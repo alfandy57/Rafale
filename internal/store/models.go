@@ -21,7 +21,7 @@ type BaseEvent struct {
 }
 
 // BeforeCreate sets the timestamp if not already set.
-func (b *BaseEvent) BeforeCreate(tx *gorm.DB) error {
+func (b *BaseEvent) BeforeCreate(_ *gorm.DB) error {
 	if b.Timestamp.IsZero() {
 		b.Timestamp = time.Now()
 	}

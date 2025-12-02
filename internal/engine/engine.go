@@ -109,7 +109,7 @@ func New(cfg *config.Config, broadcaster *pubsub.Broadcaster) (*Engine, error) {
 		&store.Event{},
 		&store.Transfer{},
 	); err != nil {
-		db.Close()
+		_ = db.Close()
 		rpcClient.Close()
 		return nil, fmt.Errorf("running migrations: %w", err)
 	}
@@ -135,14 +135,14 @@ func New(cfg *config.Config, broadcaster *pubsub.Broadcaster) (*Engine, error) {
 	for name, contract := range cfg.Contracts {
 		abiJSON, err := os.ReadFile(contract.ABI)
 		if err != nil {
-			db.Close()
+			_ = db.Close()
 			rpcClient.Close()
 			return nil, fmt.Errorf("reading ABI for %s: %w", name, err)
 		}
 
 		addr := common.HexToAddress(contract.Address)
 		if err := dec.RegisterContract(name, addr, string(abiJSON), contract.Events); err != nil {
-			db.Close()
+			_ = db.Close()
 			rpcClient.Close()
 			return nil, fmt.Errorf("registering contract %s: %w", name, err)
 		}
@@ -214,7 +214,7 @@ func (e *Engine) syncOnce(ctx context.Context) error {
 	}
 
 	// Update sync lag metric
-	lag := int64(headBlock) - int64(e.lastBlock)
+	lag := int64(headBlock) - int64(e.lastBlock) //nolint:gosec // G115: Block numbers won't overflow int64
 	if lag < 0 {
 		lag = 0
 	}
@@ -251,7 +251,7 @@ func (e *Engine) syncOnce(ctx context.Context) error {
 			e.broadcaster.BroadcastBlock(&model.Block{
 				Number:     strconv.FormatUint(header.Number.Uint64(), 10),
 				Hash:       header.Hash().Hex(),
-				Timestamp:  time.Unix(int64(header.Time), 0),
+				Timestamp:  time.Unix(int64(header.Time), 0), //nolint:gosec // G115: Timestamp won't overflow
 				ParentHash: header.ParentHash.Hex(),
 			})
 		}
@@ -264,7 +264,7 @@ func (e *Engine) syncOnce(ctx context.Context) error {
 
 	// Broadcast sync status to subscribers (if broadcaster is configured)
 	if e.broadcaster != nil {
-		newLag := int64(headBlock) - int64(toBlock)
+		newLag := int64(headBlock) - int64(toBlock) //nolint:gosec // G115: Block numbers won't overflow int64
 		if newLag < 0 {
 			newLag = 0
 		}
@@ -336,7 +336,7 @@ func (e *Engine) processLog(ctx context.Context, tx *gorm.DB, logEntry types.Log
 		return fmt.Errorf("getting block header: %w", err)
 	}
 
-	blockTime := time.Unix(int64(header.Time), 0)
+	blockTime := time.Unix(int64(header.Time), 0) //nolint:gosec // G115: Timestamp won't overflow
 
 	// Auto-store event in generic events table (always)
 	if err := e.storeGenericEvent(tx, logEntry, event, blockTime); err != nil {
@@ -349,8 +349,8 @@ func (e *Engine) processLog(ctx context.Context, tx *gorm.DB, logEntry types.Log
 			ID:          "0", // ID not available until tx commits
 			BlockNumber: strconv.FormatUint(logEntry.BlockNumber, 10),
 			TxHash:      logEntry.TxHash.Hex(),
-			TxIndex:     int(logEntry.TxIndex),
-			LogIndex:    int(logEntry.Index),
+			TxIndex:     int(logEntry.TxIndex), //nolint:gosec // G115: TxIndex is small
+			LogIndex:    int(logEntry.Index),   //nolint:gosec // G115: LogIndex is small
 			Timestamp:   blockTime,
 			Contract:    event.ContractName,
 			EventName:   event.EventName,
@@ -438,7 +438,7 @@ func (e *Engine) determineStartBlock(ctx context.Context) (uint64, error) {
 	}
 
 	// Otherwise use minimum configured start_block
-	var minConfiguredStart uint64 = ^uint64(0)
+	minConfiguredStart := ^uint64(0)
 	for _, contract := range e.cfg.Contracts {
 		if contract.StartBlock < minConfiguredStart {
 			minConfiguredStart = contract.StartBlock
