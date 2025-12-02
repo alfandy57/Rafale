@@ -4,4 +4,4 @@ Rafale is open-source, self-hosted software. It does not collect, transmit, or s
 
 All indexed blockchain data is stored locally in your own PostgreSQL database. No telemetry, analytics, or tracking is included.
 
-Contact: github.com/0xredeth/Rafale/issues
+Contact: https://github.com/0xredeth/rafale/issues
