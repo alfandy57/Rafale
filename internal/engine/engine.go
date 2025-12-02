@@ -20,8 +20,8 @@ import (
 	"github.com/0xredeth/Rafale/pkg/config"
 	"github.com/0xredeth/Rafale/pkg/decoder"
 	"github.com/0xredeth/Rafale/pkg/handler"
-	"github.com/0xredeth/Rafale/pkg/rpc"
-	"github.com/0xredeth/Rafale/pkg/store"
+	"github.com/0xredeth/Rafale/internal/rpc"
+	"github.com/0xredeth/Rafale/internal/store"
 )
 
 // Metrics for engine monitoring.
@@ -398,6 +398,49 @@ func (e *Engine) determineStartBlock(ctx context.Context) (uint64, error) {
 	}
 
 	return minConfiguredStart, nil
+}
+
+// Reload reloads the engine configuration and re-registers contracts.
+// Used for hot-reload during development.
+//
+// Parameters:
+//   - newCfg (*config.Config): new configuration to apply
+//
+// Returns:
+//   - error: nil on success, reload error on failure
+func (e *Engine) Reload(newCfg *config.Config) error {
+	log.Info().Msg("reloading engine configuration")
+
+	// Clear existing decoder state
+	e.decoder.Clear()
+
+	// Re-register contracts from new config
+	for name, contract := range newCfg.Contracts {
+		abiJSON, err := os.ReadFile(contract.ABI)
+		if err != nil {
+			return fmt.Errorf("reading ABI for %s: %w", name, err)
+		}
+
+		addr := common.HexToAddress(contract.Address)
+		if err := e.decoder.RegisterContract(name, addr, string(abiJSON), contract.Events); err != nil {
+			return fmt.Errorf("registering contract %s: %w", name, err)
+		}
+
+		log.Info().
+			Str("contract", name).
+			Str("address", contract.Address).
+			Int("events", len(contract.Events)).
+			Msg("re-registered contract")
+	}
+
+	// Update config reference
+	e.cfg = newCfg
+
+	log.Info().
+		Int("contracts", len(newCfg.Contracts)).
+		Msg("configuration reloaded successfully")
+
+	return nil
 }
 
 // Close shuts down the engine.

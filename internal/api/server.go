@@ -18,11 +18,11 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/vektah/gqlparser/v2/ast"
 
-	"github.com/0xredeth/Rafale/pkg/api/graphql/generated"
-	"github.com/0xredeth/Rafale/pkg/api/graphql/resolver"
+	"github.com/0xredeth/Rafale/internal/api/graphql/generated"
+	"github.com/0xredeth/Rafale/internal/api/graphql/resolver"
 	"github.com/0xredeth/Rafale/pkg/config"
-	"github.com/0xredeth/Rafale/pkg/rpc"
-	"github.com/0xredeth/Rafale/pkg/store"
+	"github.com/0xredeth/Rafale/internal/rpc"
+	"github.com/0xredeth/Rafale/internal/store"
 )
 
 // Server is the GraphQL API server.

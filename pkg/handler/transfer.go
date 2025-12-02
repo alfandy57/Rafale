@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/rs/zerolog/log"
 
-	"github.com/0xredeth/Rafale/pkg/store"
+	"github.com/0xredeth/Rafale/internal/store"
 )
 
 func init() {

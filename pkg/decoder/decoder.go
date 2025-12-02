@@ -230,3 +230,11 @@ func (d *Decoder) GetEventID(log types.Log) (string, bool) {
 	id, ok := d.sigToID[log.Topics[0]]
 	return id, ok
 }
+
+// Clear removes all registered contracts and events.
+// Used during hot-reload to reset state before re-registering.
+func (d *Decoder) Clear() {
+	d.abis = make(map[common.Address]*abi.ABI)
+	d.events = make(map[common.Hash]*EventInfo)
+	d.sigToID = make(map[common.Hash]string)
+}

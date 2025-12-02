@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/0xredeth/Rafale/pkg/api/graphql/generated"
-	"github.com/0xredeth/Rafale/pkg/api/graphql/model"
-	"github.com/0xredeth/Rafale/pkg/store"
+	"github.com/0xredeth/Rafale/internal/api/graphql/generated"
+	"github.com/0xredeth/Rafale/internal/api/graphql/model"
+	"github.com/0xredeth/Rafale/internal/store"
 )
 
 // SyncStatus is the resolver for the syncStatus field.

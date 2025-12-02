@@ -3,8 +3,8 @@ package resolver
 
 import (
 	"github.com/0xredeth/Rafale/pkg/config"
-	"github.com/0xredeth/Rafale/pkg/rpc"
-	"github.com/0xredeth/Rafale/pkg/store"
+	"github.com/0xredeth/Rafale/internal/rpc"
+	"github.com/0xredeth/Rafale/internal/store"
 )
 
 // Resolver provides dependencies for GraphQL resolvers.
